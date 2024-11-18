@@ -14,11 +14,10 @@ fun main() {
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day01_test")
     check(part1(testInput) == 333)
-    testInput.println()
 
     val input = readInput("Day01")
-    part1(input).println() // Correct: 65912
-    part2(input).println() // Correct: 195625
+    check(part1(input) == 65912) // Correct: 65912
+    check(part2(input) == 195625) // Correct: 195625
 }
 
 fun List<String>.toMatrix(): List<List<Int>> {
