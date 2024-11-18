@@ -1,11 +1,11 @@
 fun main() {
 
     fun part1(input: List<String>): Int =
-        buildInputMatrix(input)
-            .maxOfOrNull { it.sum() } ?: 0
+        input.toMatrix()
+            .maxOf { it.sum() }
 
     fun part2(input: List<String>): Int =
-        buildInputMatrix(input)
+        input.toMatrix()
             .map { it.sum() }
             .sortedDescending()
             .take(3)
@@ -21,11 +21,11 @@ fun main() {
     part2(input).println() // Correct: 195625
 }
 
-fun buildInputMatrix(input: List<String>): List<List<Int>> {
+fun List<String>.toMatrix(): List<List<Int>> {
     val matrix: MutableList<List<Int>> = mutableListOf()
     val row = mutableListOf<Int>()
 
-    input.forEach { num ->
+    forEach { num ->
         if (num != "") {
             row.add(num.toInt())
         } else {
@@ -33,7 +33,7 @@ fun buildInputMatrix(input: List<String>): List<List<Int>> {
             row.clear()
         }
         // Add last row
-        if (num == input.last()) {
+        if (num == last()) {
             matrix.add(row.toList())
         }
     }
