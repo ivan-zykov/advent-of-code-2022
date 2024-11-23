@@ -21,7 +21,7 @@ fun main() {
 //    part2(input).println()
 }
 
-private data class Round(
+private class Round(
     private val input: String,
 ) {
     private val opponentsShape: Shape = input.toOpponentsShape()
