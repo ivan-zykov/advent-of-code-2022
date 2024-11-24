@@ -2,48 +2,103 @@ import Outcome.*
 import Shape.*
 
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.map { line -> Round(line) }
-            .sumOf { round -> round.getMyTotalScore() }
-    }
+
+    fun part1(input: List<String>): Int =
+        input.map { line -> line.toShapesPartOne() }
+            .map { shapes -> shapes.toOutcomeAndMyShape() }
+            .sumOf { outcomeToShape -> outcomeToShape.toTotalScore() }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        return input.map { line -> line.toShapesPartTwo() }
+            .map { shapes -> shapes.toOutcomeAndMyShape() }
+            .sumOf { outcomeToShape -> outcomeToShape.toTotalScore() }
     }
 
     // Or read a large test input from the `src/Day01_test.txt` file:
     val testInput = readInputAsListOfLinesFrom("Day02_test")
     check(part1(testInput) == 15)
+    check(part2(testInput) == 12)
 
     // Read the input from the `src/Day01.txt` file.
     val input = readInputAsListOfLinesFrom("Day02")
-    part1(input).println() // Correct: 10404
-//    part2(input).println()
+    check(part1(input) == 10404)
+    check(part2(input) == 10334)
 }
 
-private class Round(
-    private val input: String,
-) {
-    private fun getOpponentsShape(): Shape = input.toOpponentsShape()
-    private fun getMyShape(): Shape = input.toMyShape()
-    private fun getOutcome(): Outcome = compareShapes(getOpponentsShape(), getMyShape())
-
-    fun getMyTotalScore(): Int = getMyShape().toScore() + getOutcome().toScore()
+private fun String.toShapesPartOne(): Pair<Shape, Shape> {
+    val opponentsShape = this.getOpponentsShape()
+    val myShape =
+        when (val opponentsString = this.last()) {
+            'X' -> ROCK
+            'Y' -> PAPER
+            'Z' -> SCISSORS
+            else -> throw IllegalArgumentException("Unknown opponent's shape $opponentsString")
+        }
+    return opponentsShape to myShape
 }
 
-private fun Outcome.toScore(): Int =
-    when (this) {
+private fun String.getOpponentsShape() =
+    when (val opponentsString = this.first()) {
+        'A' -> ROCK
+        'B' -> PAPER
+        'C' -> SCISSORS
+        else -> throw IllegalArgumentException("Unknown opponent's shape $opponentsString")
+    }
+
+private fun Pair<Shape, Shape>.toOutcomeAndMyShape(): Pair<Outcome, Shape> {
+    val opponentsShape = this.first
+    val myShape = this.second
+    val outcome = when {
+        opponentsShape == myShape -> DRAW
+        opponentsShape == ROCK && myShape == PAPER -> WIN
+        opponentsShape == ROCK && myShape == SCISSORS -> LOSE
+        opponentsShape == SCISSORS && myShape == ROCK -> WIN
+        opponentsShape == SCISSORS && myShape == PAPER -> LOSE
+        opponentsShape == PAPER && myShape == ROCK -> LOSE
+        opponentsShape == PAPER && myShape == SCISSORS -> WIN
+        else -> throw IllegalArgumentException("Outcome of opponent's $opponentsShape and my $myShape is unknown")
+    }
+    return outcome to myShape
+}
+
+private fun Pair<Outcome, Shape>.toTotalScore(): Int =
+    when (this.first) {
         WIN -> 6
         DRAW -> 3
         LOSE -> 0
-    }
-
-private fun Shape.toScore(): Int =
-    when (this) {
+    } + when (this.second) {
         ROCK -> 1
         PAPER -> 2
         SCISSORS -> 3
     }
+
+private fun String.toShapesPartTwo(): Pair<Shape, Shape> {
+    val opponentsShape = this.getOpponentsShape()
+    val myChar = this.last()
+    val myShape = when (opponentsShape) {
+        ROCK -> when (myChar) {
+            'X' -> SCISSORS
+            'Y' -> ROCK
+            'Z' -> PAPER
+            else -> throw IllegalArgumentException("Unknown my shape $myChar")
+        }
+
+        PAPER -> when (myChar) {
+            'X' -> ROCK
+            'Y' -> PAPER
+            'Z' -> SCISSORS
+            else -> throw IllegalArgumentException("Unknown my shape $myChar")
+        }
+
+        SCISSORS -> when (myChar) {
+            'X' -> PAPER
+            'Y' -> SCISSORS
+            'Z' -> ROCK
+            else -> throw IllegalArgumentException("Unknown my shape $myChar")
+        }
+    }
+    return opponentsShape to myShape
+}
 
 private enum class Shape {
     ROCK, PAPER, SCISSORS
@@ -52,31 +107,3 @@ private enum class Shape {
 private enum class Outcome {
     WIN, LOSE, DRAW
 }
-
-private fun String.toOpponentsShape(): Shape =
-    when (this.first()) {
-        'A' -> ROCK
-        'B' -> PAPER
-        'C' -> SCISSORS
-        else -> throw IllegalArgumentException("Unknown opponent's shape: $this")
-    }
-
-private fun String.toMyShape(): Shape =
-    when (this.last()) {
-        'X' -> ROCK
-        'Y' -> PAPER
-        'Z' -> SCISSORS
-        else -> throw IllegalArgumentException("Unknown opponent's shape: $this")
-    }
-
-private fun compareShapes(opponent: Shape, me: Shape): Outcome =
-    when {
-        opponent == me -> DRAW
-        opponent == ROCK && me == PAPER -> WIN
-        opponent == ROCK && me == SCISSORS -> LOSE
-        opponent == SCISSORS && me == ROCK -> WIN
-        opponent == SCISSORS && me == PAPER -> LOSE
-        opponent == PAPER && me == ROCK -> LOSE
-        opponent == PAPER && me == SCISSORS -> WIN
-        else -> throw IllegalArgumentException("Outcome of opponent's $opponent and my $me is unknown")
-    }
