@@ -4,7 +4,7 @@ import Shape.*
 fun main() {
     fun part1(input: List<String>): Int {
         return input.map { line -> Round(line) }
-            .sumOf { round -> round.myShapeScore + round.myOutcomeScore }
+            .sumOf { round -> round.getMyTotalScore() }
     }
 
     fun part2(input: List<String>): Int {
@@ -24,11 +24,11 @@ fun main() {
 private class Round(
     private val input: String,
 ) {
-    private val opponentsShape: Shape = input.toOpponentsShape()
-    private val myShape: Shape = input.toMyShape()
-    private val outcome: Outcome = compareShapes(opponentsShape, myShape)
-    val myShapeScore: Int get() = myShape.toScore()
-    val myOutcomeScore: Int get() = outcome.toScore()
+    private fun getOpponentsShape(): Shape = input.toOpponentsShape()
+    private fun getMyShape(): Shape = input.toMyShape()
+    private fun getOutcome(): Outcome = compareShapes(getOpponentsShape(), getMyShape())
+
+    fun getMyTotalScore(): Int = getMyShape().toScore() + getOutcome().toScore()
 }
 
 private fun Outcome.toScore(): Int =
