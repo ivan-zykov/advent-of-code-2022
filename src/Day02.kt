@@ -28,21 +28,21 @@ fun main() {
 private fun String.toShapesPartOne(): Pair<Shape, Shape> {
     val opponentsShape = this.getOpponentsShape()
     val myShape =
-        when (val opponentsString = this.last()) {
+        when (val myChar = this.last()) {
             'X' -> ROCK
             'Y' -> PAPER
             'Z' -> SCISSORS
-            else -> throw IllegalArgumentException("Unknown opponent's shape $opponentsString")
+            else -> throw IllegalArgumentException("Unknown my shape $myChar")
         }
     return opponentsShape to myShape
 }
 
 private fun String.getOpponentsShape() =
-    when (val opponentsString = this.first()) {
+    when (val opponentsChar = this.first()) {
         'A' -> ROCK
         'B' -> PAPER
         'C' -> SCISSORS
-        else -> throw IllegalArgumentException("Unknown opponent's shape $opponentsString")
+        else -> throw IllegalArgumentException("Unknown opponent's shape $opponentsChar")
     }
 
 private fun Pair<Shape, Shape>.toOutcomeAndMyShape(): Pair<Outcome, Shape> {
@@ -80,24 +80,28 @@ private fun String.toShapesPartTwo(): Pair<Shape, Shape> {
             'X' -> SCISSORS
             'Y' -> ROCK
             'Z' -> PAPER
-            else -> throw IllegalArgumentException("Unknown my shape $myChar")
+            else -> failChoosingMyShape(myChar)
         }
 
         PAPER -> when (myChar) {
             'X' -> ROCK
             'Y' -> PAPER
             'Z' -> SCISSORS
-            else -> throw IllegalArgumentException("Unknown my shape $myChar")
+            else -> failChoosingMyShape(myChar)
         }
 
         SCISSORS -> when (myChar) {
             'X' -> PAPER
             'Y' -> SCISSORS
             'Z' -> ROCK
-            else -> throw IllegalArgumentException("Unknown my shape $myChar")
+            else -> failChoosingMyShape(myChar)
         }
     }
     return opponentsShape to myShape
+}
+
+private fun failChoosingMyShape(char: Char): Nothing {
+    throw IllegalArgumentException("Unknown my char $char")
 }
 
 private enum class Shape {
